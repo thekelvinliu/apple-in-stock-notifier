@@ -17,6 +17,7 @@
     "babel-preset-env": "^7.0.0-beta.3",
     "eslint": "^4.9.0",
     "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-loader": "^1.9.0",
     "eslint-plugin-import": "^2.7.0",
     "husky": "^0.14.3",
     "serverless-webpack": "^3.1.2",
@@ -25,6 +26,7 @@
   "scripts": {
     "build": "sls webpack",
     "clean": "rm -rf lib",
+    "deploy": "sls deploy",
     "precommit": "eslint src",
     "reset": "rm -rf node_modules yarn.lock package-lock.json && yarn"
   }
