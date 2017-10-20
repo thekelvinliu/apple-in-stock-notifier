@@ -1,0 +1,51 @@
+service: apple-in-stock-notifier
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  memorySize: 128
+  cfLogs: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource:
+        Ref: notifier
+
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+custom:
+  stage: ${opt:stage, dev}
+  names:
+    lambda: ${self:service}-${slef:custom.stage}-lambda
+    schedule-event: ${self:service}-${self:custom.stage}-schedule-event
+    sns: ${self:service}-${slef:custom.stage}-sns
+
+functions:
+  poller:
+    name: ${self:custom.names.lambda}
+    description: polls apple for retail store product availability
+    handler: src/index.default
+    environment:
+      SNS_ARN:
+        Ref: notifier
+      CPPART: TMOBILE/US
+      PART_NUMBER: MQ6K2LL/A
+      LOCATION: ${env:MY_ZIPCODE}
+    events:
+      - schedule:
+          name: ${self:custom.names.schedule-event}
+          description: schedule event for ${self:service}
+          rate: rate(10 minutes)
+
+resources:
+  Resources:
+    notifier:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ${self:custom.names.sns}
+        TopicName: ${self:custom.names.sns}

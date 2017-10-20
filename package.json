@@ -1,0 +1,10 @@
+{
+  "name": "apple-in-stock-notifier",
+  "version": "0.0.1",
+  "description": "a simple notification service for when apple products become available",
+  "main": "lib/index.js",
+  "repository": "git@github.com:thekelvinliu/apple-in-stock-notifier.git",
+  "author": "kelvin liu <kelvin@thekelvinliu.com>",
+  "license": "MIT",
+  "private": true
+}
