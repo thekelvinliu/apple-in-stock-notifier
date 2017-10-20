@@ -1,11 +1,13 @@
 {
   "presets": [
-    "env",
-    {
-      "targets": {
-        "node": "6.10"
-      },
-      "shippedProposals": true
-    }
+    [
+      "env",
+      {
+        "targets": {
+          "node": "6.10"
+        },
+        "shippedProposals": true
+      }
+    ]
   ]
 }
