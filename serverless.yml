@@ -14,11 +14,6 @@ provider:
 
 plugins:
   - serverless-webpack
-  - serverless-offline
-  - serverless-offline-scheduler
-
-package:
-  individually: true
 
 custom:
   basename: ${self:service}-${self:custom.stage}
@@ -43,7 +38,7 @@ functions:
           rate: rate(5 minutes)
           input:
             cppart: TMOBILE/US
-            part-number: MQ6K2LL/A
+            partNumber: MQ6K2LL/A
             zipcode: ${env:MY_ZIPCODE}
 
 resources:
