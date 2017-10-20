@@ -28,7 +28,7 @@ export default function handler(event, context, callback) {
   if (!partNumber)
     return callback(new Error('the event object is missing its partNumber property'));
   if (!zipcode)
-    return callback(new Error('the event object is missint its zipcode property'));
+    return callback(new Error('the event object is missing its zipcode property'));
 
   // construct url
   const url = new URL(BASE_URL);
