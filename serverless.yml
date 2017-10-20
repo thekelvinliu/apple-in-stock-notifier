@@ -14,16 +14,18 @@ provider:
 
 plugins:
   - serverless-webpack
+  - serverless-offline
+  - serverless-offline-scheduler
 
 package:
   individually: true
 
 custom:
-  stage: ${opt:stage, dev}
+  basename: ${self:service}-${self:custom.stage}
+  stage: ${opt:stage, 'dev'}
   names:
-    lambda: ${self:service}-${slef:custom.stage}-lambda
-    schedule-event: ${self:service}-${self:custom.stage}-schedule-event
-    sns: ${self:service}-${slef:custom.stage}-sns
+    lambda: ${self:custom.basename}-lambda
+    sns: ${self:custom.basename}-sns
 
 functions:
   poller:
@@ -33,14 +35,16 @@ functions:
     environment:
       SNS_ARN:
         Ref: notifier
-      CPPART: TMOBILE/US
-      PART_NUMBER: MQ6K2LL/A
-      LOCATION: ${env:MY_ZIPCODE}
     events:
+      # multiple schedule events can be configured to watch multiple products
       - schedule:
-          name: ${self:custom.names.schedule-event}
-          description: schedule event for ${self:service}
-          rate: rate(10 minutes)
+          name: ${self:custom.basename}-tmobile-iphone-8-space
+          description: schedule event for a space grey tmobile iphone 8
+          rate: rate(5 minutes)
+          input:
+            cppart: TMOBILE/US
+            part-number: MQ6K2LL/A
+            zipcode: ${env:MY_ZIPCODE}
 
 resources:
   Resources:
