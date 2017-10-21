@@ -1,6 +1,6 @@
 import { SNS } from 'aws-sdk';
 import fetch from 'node-fetch';
-import { URL } from 'url';
+import url from 'url';
 
 const BASE_URL = 'https://www.apple.com/shop/retail/pickup-message';
 
@@ -35,14 +35,14 @@ export default async function handler(event, context, callback) {
       throw new Error('the event object is missing its zipcode property');
 
     // construct url
-    const url = new URL(BASE_URL);
-    url.searchParams.set('location', zipcode);
-    url.searchParams.set('parts.0', partNumber);
+    const appleURL = new url.URL(BASE_URL);
+    appleURL.searchParams.set('location', zipcode);
+    appleURL.searchParams.set('parts.0', partNumber);
     if (cppart)
-      url.searchParams.set('cppart', cppart);
+      appleURL.searchParams.set('cppart', cppart);
 
     // get json response
-    const json = await fetch(url.toString()).then(res => res.json());
+    const json = await fetch(appleURL.toString()).then(res => res.json());
     // grab store data
     const { body: { stores } } = json;
     if (!stores || !Array.isArray(stores))
