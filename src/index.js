@@ -15,32 +15,32 @@ const sns = new SNS();
  * @returns {Object} the result of the callback function
  */
 export default async function handler(event, context, callback) {
-  // log incoming event
-  console.log('received event');
-  console.log(JSON.stringify(event));
-
-  // validate variables
-  const { SNS_ARN: TopicArn } = process.env;
-  if (!TopicArn)
-    return callback(new Error('the SNS_TOPIC environment variable must be set'));
-  const {
-    cppart,
-    partNumber,
-    zipcode
-  } = event;
-  if (!partNumber)
-    return callback(new Error('the event object is missing its partNumber property'));
-  if (!zipcode)
-    return callback(new Error('the event object is missing its zipcode property'));
-
-  // construct url
-  const url = new URL(BASE_URL);
-  url.searchParams.set('location', zipcode);
-  url.searchParams.set('parts.0', partNumber);
-  if (cppart)
-    url.searchParams.set('cppart', cppart);
-
   try {
+    // log incoming event
+    console.log('received event');
+    console.log(JSON.stringify(event));
+
+    // validate variables
+    const { SNS_ARN: TopicArn } = process.env;
+    if (!TopicArn)
+      throw new Error('the SNS_TOPIC environment variable must be set');
+    const {
+      cppart,
+      partNumber,
+      zipcode
+    } = event;
+    if (!partNumber)
+      throw new Error('the event object is missing its partNumber property');
+    if (!zipcode)
+      throw new Error('the event object is missing its zipcode property');
+
+    // construct url
+    const url = new URL(BASE_URL);
+    url.searchParams.set('location', zipcode);
+    url.searchParams.set('parts.0', partNumber);
+    if (cppart)
+      url.searchParams.set('cppart', cppart);
+
     // get json response
     const json = await fetch(url.toString()).then(res => res.json());
     // grab store data
@@ -111,6 +111,5 @@ export default async function handler(event, context, callback) {
     console.error(err);
     return callback(err);
   }
-
   return callback(null, 'ok');
 }
