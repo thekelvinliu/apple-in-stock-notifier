@@ -48,3 +48,10 @@ resources:
       Properties:
         DisplayName: ${self:custom.names.sns}
         TopicName: ${self:custom.names.sns}
+    subscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:MY_EMAIL}
+        Protocol: email
+        TopicArn:
+          Ref: notifier
