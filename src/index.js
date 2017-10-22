@@ -32,15 +32,21 @@ export default async function handler(event, context, callback) {
 
     // send request
     const url = `${BASE_URL}?${qs.stringify(event)}`;
-    console.log(url);
     const json = await fetch(url).then(res => res.json());
     // grab store data
     const { body: { stores } } = json;
     if (!stores || !Array.isArray(stores))
       throw new Error('body.stores in the json response is not an array');
-    // format data
+    // extract useful information
     const data = stores
+      // only consider stores within 15 miles
       .filter(obj => obj.storedistance <= 15)
+      // log store data
+      .map(obj => {
+        console.log(JSON.stringify(obj, null, 2));
+        return obj;
+      })
+      // format data
       .map(obj => {
         const {
           storeEmail: email,
@@ -56,7 +62,7 @@ export default async function handler(event, context, callback) {
             }
           }
         } = obj;
-        const retval = {
+        return {
           id,
           name,
           product,
@@ -66,8 +72,6 @@ export default async function handler(event, context, callback) {
           phone: phoneNumber.replace(/\D/g, ''),
           homepage
         };
-        console.log(JSON.stringify(retval));
-        return retval;
       });
     // cache new data
     const baseKey = Object.keys(event).sort().map(k => event[k]).join('|');
@@ -84,8 +88,8 @@ export default async function handler(event, context, callback) {
       // create message
       const msg = [
         incoming.product,
-        'is now',
-        incoming.available ? 'available' : 'unavailable',
+        'is',
+        incoming.available ? 'now available' : 'unavailable',
         'at',
         incoming.name
       ].join(' ');
