@@ -2,10 +2,20 @@ import { SNS } from 'aws-sdk';
 import fetch from 'node-fetch';
 import qs from 'querystring';
 
-const BASE_URL = 'https://www.apple.com/shop/retail/pickup-message';
+// unpack environment variables
+const {
+  BASE_URL,
+  MAX_DISTANCE = '50',
+  SNS_ARN
+} = process.env;
+if (!BASE_URL)
+  throw new Error('the BASE_URL environment variable must be set');
+if (!SNS_ARN)
+  throw new Error('the SNS_ARN environment variable must be set');
 
 const cache = new Map();
 const has = Object.prototype.hasOwnProperty;
+const maxDistance = parseInt(MAX_DISTANCE, 10);
 const sns = new SNS();
 
 /**
@@ -21,10 +31,7 @@ export default async function handler(event, context, callback) {
     console.log('received event');
     console.log(JSON.stringify(event));
 
-    // validate inputs
-    const { SNS_ARN: TopicArn } = process.env;
-    if (!TopicArn)
-      throw new Error('the SNS_TOPIC environment variable must be set');
+    // validate event input
     if (!has.call(event, 'location'))
       throw new Error('the event object is missing its location property');
     if (!has.call(event, 'parts.0'))
@@ -39,11 +46,11 @@ export default async function handler(event, context, callback) {
       throw new Error('body.stores in the json response is not an array');
     // extract useful information
     const data = stores
-      // only consider stores within 15 miles
-      .filter(obj => obj.storedistance <= 15)
+      // only consider stores within MAX_DISTANCE miles
+      .filter(obj => obj.storedistance <= maxDistance)
       // log store data
       .map(obj => {
-        console.log(JSON.stringify(obj, null, 2));
+        console.log(JSON.stringify(obj));
         return obj;
       })
       // format data
@@ -96,7 +103,7 @@ export default async function handler(event, context, callback) {
       const payload = {
         Subject: msg.toLowerCase(),
         Message: JSON.stringify(incoming).toLowerCase(),
-        TopicArn
+        TopicArn: SNS_ARN
       };
       console.log(`publishing payload for key: '${key}'`);
       console.log(JSON.stringify(payload));

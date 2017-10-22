@@ -28,6 +28,8 @@ functions:
     description: polls apple for retail store product availability
     handler: src/index.default
     environment:
+      BASE_URL: https://www.apple.com/shop/retail/pickup-message
+      MAX_DISTANCE: 15
       SNS_ARN:
         Ref: notifier
     events:
