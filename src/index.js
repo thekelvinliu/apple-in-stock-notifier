@@ -56,7 +56,7 @@ export default async function handler(event, context, callback) {
             }
           }
         } = obj;
-        return {
+        const retval = {
           id,
           name,
           product,
@@ -66,6 +66,8 @@ export default async function handler(event, context, callback) {
           phone: phoneNumber.replace(/\D/g, ''),
           homepage
         };
+        console.log(JSON.stringify(retval));
+        return retval;
       });
     // cache new data
     const baseKey = Object.keys(event).sort().map(k => event[k]).join('|');
