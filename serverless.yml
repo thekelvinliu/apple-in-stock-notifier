@@ -35,9 +35,8 @@ functions:
       - schedule:
           name: ${self:custom.basename}-tmobile-iphone-8-space
           description: schedule event for a space grey tmobile iphone 8
-          rate: rate(5 minutes)
+          rate: rate(3 minutes)
           input:
-            cppart: TMOBILE/US
             parts.0: MQ6K2LL/A
             location: ${env:MY_ZIPCODE}
 
