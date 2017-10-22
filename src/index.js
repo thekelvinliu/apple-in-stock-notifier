@@ -1,10 +1,11 @@
 import { SNS } from 'aws-sdk';
 import fetch from 'node-fetch';
-import url from 'url';
+import qs from 'querystring';
 
 const BASE_URL = 'https://www.apple.com/shop/retail/pickup-message';
 
 const cache = new Map();
+const has = Object.prototype.hasOwnProperty;
 const sns = new SNS();
 
 /**
@@ -20,29 +21,19 @@ export default async function handler(event, context, callback) {
     console.log('received event');
     console.log(JSON.stringify(event));
 
-    // validate variables
+    // validate inputs
     const { SNS_ARN: TopicArn } = process.env;
     if (!TopicArn)
       throw new Error('the SNS_TOPIC environment variable must be set');
-    const {
-      cppart,
-      partNumber,
-      zipcode
-    } = event;
-    if (!partNumber)
-      throw new Error('the event object is missing its partNumber property');
-    if (!zipcode)
-      throw new Error('the event object is missing its zipcode property');
+    if (!has.call(event, 'location'))
+      throw new Error('the event object is missing its location property');
+    if (!has.call(event, 'parts.0'))
+      throw new Error('the event object is missing its parts.0 property');
 
-    // construct url
-    const appleURL = new url.URL(BASE_URL);
-    appleURL.searchParams.set('location', zipcode);
-    appleURL.searchParams.set('parts.0', partNumber);
-    if (cppart)
-      appleURL.searchParams.set('cppart', cppart);
-
-    // get json response
-    const json = await fetch(appleURL.toString()).then(res => res.json());
+    // send request
+    const url = `${BASE_URL}?${qs.stringify(event)}`;
+    console.log(url);
+    const json = await fetch(url).then(res => res.json());
     // grab store data
     const { body: { stores } } = json;
     if (!stores || !Array.isArray(stores))
@@ -58,7 +49,7 @@ export default async function handler(event, context, callback) {
           storeName: name,
           phoneNumber,
           partsAvailability: {
-            [event.partNumber]: {
+            [event['parts.0']]: {
               storePickupQuote: message,
               storePickupProductTitle: product,
               pickupDisplay: status

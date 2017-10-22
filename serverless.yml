@@ -38,8 +38,8 @@ functions:
           rate: rate(5 minutes)
           input:
             cppart: TMOBILE/US
-            partNumber: MQ6K2LL/A
-            zipcode: ${env:MY_ZIPCODE}
+            parts.0: MQ6K2LL/A
+            location: ${env:MY_ZIPCODE}
 
 resources:
   Resources:
