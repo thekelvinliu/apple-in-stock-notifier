@@ -75,7 +75,7 @@ export default async function handler(event, context, callback) {
       // do nothing if there's no change
       if (current && current.available === incoming.available) {
         console.log(`no change for key: '${key}'`);
-        return;
+        return Promise.resolve();
       }
       // save the incoming data
       cache.set(key, incoming);
@@ -97,6 +97,7 @@ export default async function handler(event, context, callback) {
       // publish payload to sns
       const { MessageId } = await sns.publish(payload).promise();
       console.log(`successfully published message with id '${MessageId}'`);
+      return Promise.resolve();
     }));
   } catch (err) {
     console.error(err);
